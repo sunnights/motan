@@ -196,11 +196,11 @@ public class ZookeeperRegistry extends FailbackRegistry {
         return toServicePath(url) + MotanConstants.PATH_SEPARATOR + type;
     }
 
-    private String toNodePath(URL url, ZkNodeType nodeType) {
+    protected String toNodePath(URL url, ZkNodeType nodeType) {
         return toNodeTypePath(url, nodeType) + MotanConstants.PATH_SEPARATOR + url.getServerPortStr();
     }
 
-    private void createNode(URL url, ZkNodeType nodeType) {
+    protected void createNode(URL url, ZkNodeType nodeType) {
         String nodeTypePath = toNodeTypePath(url, nodeType);
         if (!zkClient.exists(nodeTypePath)) {
             zkClient.createPersistent(nodeTypePath, true);
@@ -208,7 +208,7 @@ public class ZookeeperRegistry extends FailbackRegistry {
         zkClient.createEphemeral(toNodePath(url, nodeType), url.toFullStr());
     }
 
-    private void removeNode(URL url, ZkNodeType nodeType) {
+    protected void removeNode(URL url, ZkNodeType nodeType) {
         String nodePath = toNodePath(url, nodeType);
         if (zkClient.exists(nodePath)) {
             zkClient.delete(nodePath);
