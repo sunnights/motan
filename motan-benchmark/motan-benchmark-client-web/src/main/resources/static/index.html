@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Motan性能测试</title>
+    <link href="/assets/global/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/assets/global/plugins/simple-line-icons/simple-line-icons.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/assets/global/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/assets/global/plugins/bootstrap-switch/css/bootstrap-switch.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/assets/global/css/components.min.css" rel="stylesheet" id="style_components" type="text/css"/>
+    <link href="/assets/global/css/plugins.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/assets/layouts/layout/css/layout.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/assets/layouts/layout/css/themes/darkblue.min.css" rel="stylesheet" type="text/css" id="style_color"/>
+    <link href="/assets/layouts/layout/css/custom.min.css" rel="stylesheet" type="text/css"/>
+</head>
+
+<body class="page-content-white page-full-width">
+<div class="page-wrapper">
+    <div class="clearfix"></div>
+    <div class="page-container">
+        <div class="page-content-wrapper">
+            <div class="page-content">
+                <h1 class="page-title">Motan性能测试</h1>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="portlet light bordered">
+                            <div class="portlet-title">
+                                <div class="caption">
+                                    <span class="caption-subject font-dark bold uppercase">配置</span>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                <form role="form" id="form">
+                                    <div class="form-body">
+                                        <div class="row">
+                                            <div class="col-md-1">
+                                                <div class="form-group form-md-line-input has-info">
+                                                    <label>预热时间</label>
+                                                    <input name="warmupTime" type="text" class="form-control" value="5">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1">
+                                                <div class="form-group form-md-line-input has-info">
+                                                    <label>测试时间</label>
+                                                    <input name="benchmarkTime" type="text" class="form-control" value="10">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1">
+                                                <div class="form-group form-md-line-input has-info">
+                                                    <label>并发数</label>
+                                                    <input name="concurrent" type="text" class="form-control" value="1,10,20,50">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group form-md-line-input has-info">
+                                                    <label>测试数据类型</label>
+                                                    <input name="category" type="text" class="form-control" value="Empty,POJO,1KString,5KString,10KString">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="form-group form-md-line-input has-info">
+                                                    <label id="endTime">结束时间：</label>
+                                                    <button class="btn blue form-control" type="button" onclick="drawChart($('#form').serialize())">执行</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="form-group form-md-line-input has-success">
+                                                    <label>direct url</label>
+                                                    <input name="directUrl" type="text" class="form-control" value="localhost:8002">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-1">
+                                                <div class="form-group form-md-line-input has-success">
+                                                    <label>protocol name</label>
+                                                    <input name="protocolName" type="text" class="form-control input-xsmall" value="motan">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1">
+                                                <div class="form-group form-md-line-input has-success">
+                                                    <label>serialization</label>
+                                                    <input name="serialization" type="text" class="form-control input-xsmall" value="hessian2">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1">
+                                                <div class="form-group form-md-line-input has-success">
+                                                    <label>endpointFactory</label>
+                                                    <input name="endpointFactory" type="text" class="form-control input-xsmall" value="motan">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1">
+                                                <div class="form-group form-md-line-input has-success">
+                                                    <label>HA strategy</label>
+                                                    <input name="haStrategy" type="text" class="form-control input-xsmall" value="failfast">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1">
+                                                <div class="form-group form-md-line-input has-success">
+                                                    <label>load balance</label>
+                                                    <input name="loadBalance" type="text" class="form-control input-xsmall" value="roundrobin">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1">
+                                                <div class="form-group form-md-line-input has-success">
+                                                    <label>min connection</label>
+                                                    <input name="minConnection" type="text" class="form-control input-xsmall" value="1">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1">
+                                                <div class="form-group form-md-line-input has-success">
+                                                    <label>max connection</label>
+                                                    <input name="maxConnection" type="text" class="form-control input-xsmall" value="10">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <!--<div class="col-md-3">
+                                                <div class="form-group form-md-line-input has-success">
+                                                    <label>interface</label>
+                                                    <input name="interface" type="text" class="form-control" value="com.weibo.motan.benchmark.BenchmarkServic">
+                                                </div>
+                                            </div>-->
+                                            <div class="col-md-2">
+                                                <div class="form-group form-md-line-input has-success">
+                                                    <label>group</label>
+                                                    <input name="group" type="text" class="form-control" value="motan-benchmark-rpc">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="form-group form-md-line-input has-success">
+                                                    <label>module</label>
+                                                    <input name="module" type="text" class="form-control" value="motan-benchmark-rpc">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="form-group form-md-line-input has-success">
+                                                    <label>application</label>
+                                                    <input name="application" type="text" class="form-control" value="motanBenchmark">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1">
+                                                <div class="form-group form-md-line-input has-success">
+                                                    <label>request timeout</label>
+                                                    <input name="requestTimeout" type="text" class="form-control input-xsmall" value="300">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1">
+                                                <div class="form-group form-md-line-input has-success">
+                                                    <label>retries</label>
+                                                    <input name="retries" type="text" class="form-control input-xsmall" value="0">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1">
+                                                <div class="form-group form-md-line-input has-success">
+                                                    <label>throw exception</label>
+                                                    <input name="throwException" type="text" class="form-control input-xsmall" value="true">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                                <div style="width: 800px;height: 400px;">
+                                    <div style="width: 800px; height: 400px; display: block; position:absolute;">
+                                        <div id="main" style="display: block; position:absolute; left: 0;right: 0;top: 0;bottom: 0; padding: 10px 10px 10px 10px;;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/assets/global/plugins/jquery.min.js" type="text/javascript"></script>
+<script src="/assets/global/plugins/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="/assets/global/plugins/bootstrap-switch/js/bootstrap-switch.min.js" type="text/javascript"></script>
+<script src="/assets/global/plugins/echarts.min.js"></script>
+
+<script type="text/javascript">
+    function drawChart(formData) {
+        var time = Number(form.warmupTime.value) + Number(form.benchmarkTime.value);
+        var concurrent = form.concurrent.value.split(",").length;
+        var category = form.category.value.split(",").length;
+        var totalTime = time * concurrent * category;
+        var endTime = new Date((new Date()).getTime() + totalTime * 1000).toLocaleTimeString();
+        document.getElementById("endTime").innerHTML = "结束时间：" + endTime;
+        var myChart = echarts.init(document.getElementById('main'));
+        myChart.showLoading();
+        $.ajax({
+            url: "benchmark.json",
+            data: formData,
+            type: "POST",
+            dataType: "json",
+            success: function (data) {
+                myChart.hideLoading();
+                myChart.setOption(data, true);
+            }
+        });
+    }
+</script>
+</body>
+
+</html>
