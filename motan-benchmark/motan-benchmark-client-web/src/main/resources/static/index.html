@@ -48,7 +48,7 @@
                                             <div class="col-md-1">
                                                 <div class="form-group form-md-line-input has-info">
                                                     <label>并发数</label>
-                                                    <input name="concurrent" type="text" class="form-control" value="1,10,20,50">
+                                                    <input name="concurrent" type="text" class="form-control" value="1,10,20,50,80,100">
                                                 </div>
                                             </div>
                                             <div class="col-md-4">
@@ -88,7 +88,7 @@
                                             <div class="col-md-1">
                                                 <div class="form-group form-md-line-input has-success">
                                                     <label>endpointFactory</label>
-                                                    <input name="endpointFactory" type="text" class="form-control input-xsmall" value="motan">
+                                                    <input name="endpointFactory" type="text" class="form-control input-xsmall" value="netty4">
                                                 </div>
                                             </div>
                                             <div class="col-md-1">
@@ -144,7 +144,7 @@
                                             <div class="col-md-1">
                                                 <div class="form-group form-md-line-input has-success">
                                                     <label>request timeout</label>
-                                                    <input name="requestTimeout" type="text" class="form-control input-xsmall" value="300">
+                                                    <input name="requestTimeout" type="text" class="form-control input-xsmall" value="500">
                                                 </div>
                                             </div>
                                             <div class="col-md-1">
@@ -182,7 +182,7 @@
 
 <script type="text/javascript">
     function drawChart(formData) {
-        var time = Number(form.warmupTime.value) + Number(form.benchmarkTime.value);
+        var time = Number(form.warmupTime.value) + Number(form.benchmarkTime.value) + 5;
         var concurrent = form.concurrent.value.split(",").length;
         var category = form.category.value.split(",").length;
         var totalTime = time * concurrent * category;

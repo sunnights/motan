@@ -30,11 +30,11 @@ public class MotanBenchmarkClient extends AbstractBenchmarkClient {
     }
 
     @Override
-    public ClientRunnable getClientRunnable(String classname, String size, CyclicBarrier barrier,
+    public ClientRunnable getClientRunnable(String classname, String str, CyclicBarrier barrier,
                                             CountDownLatch latch, long startTime, long endTime) {
         Class[] parameterTypes = new Class[]{BenchmarkService.class, String.class, CyclicBarrier.class,
                 CountDownLatch.class, long.class, long.class};
-        Object[] parameters = new Object[]{benchmarkService, size, barrier, latch, startTime, endTime};
+        Object[] parameters = new Object[]{benchmarkService, str, barrier, latch, startTime, endTime};
 
         ClientRunnable clientRunnable = null;
         try {

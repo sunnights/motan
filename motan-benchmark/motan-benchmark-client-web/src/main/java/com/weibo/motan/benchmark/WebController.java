@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -33,7 +34,7 @@ import java.util.stream.Stream;
 public class WebController {
 
     @RequestMapping("/benchmark.json")
-    public String benchmark(HttpServletRequest request) throws ClassNotFoundException {
+    public String benchmark(HttpServletRequest request) throws ClassNotFoundException, InterruptedException {
         BenchmarkService benchmarkService = getBenchmarkService(request);
         List<Integer> concurrentList = Arrays.stream(request.getParameter("concurrent").split(","))
                 .map(Integer::parseInt)
@@ -43,33 +44,36 @@ public class WebController {
         int benchmarkTime = Integer.parseInt(request.getParameter("benchmarkTime"));
         Map<String, Map<String, Long>> tpsData = new LinkedHashMap<>(concurrentList.size());
         Map<String, Map<String, Long>> rtData = new LinkedHashMap<>(concurrentList.size());
-        for (int num : concurrentList) {
-            for (String category : categoryList) {
-                String classname = null;
-                String size = "1";
-                switch (category) {
-                    case "Empty":
-                        classname = "com.weibo.motan.benchmark.temp.impl.TestEmptyRunnable";
+        for (String category : categoryList) {
+            String classname = null;
+            String str = "";
+            switch (category) {
+                case "Empty":
+                    classname = "com.weibo.motan.benchmark.temp.impl.TestEmptyRunnable";
+                    break;
+                case "POJO":
+                    classname = "com.weibo.motan.benchmark.temp.impl.TestPojoRunnable";
+                    break;
+                default:
+                    if (!category.contains("KString")) {
                         break;
-                    case "POJO":
-                        classname = "com.weibo.motan.benchmark.temp.impl.TestPojoRunnable";
-                        break;
-                    case "1KString":
-                        classname = "com.weibo.motan.benchmark.temp.impl.TestStringRunnable";
-                        break;
-                    default:
-                        if (!category.contains("KString")) {
-                            break;
-                        }
-                        classname = "com.weibo.motan.benchmark.temp.impl.TestStringRunnable";
-                        size = category.split("KString")[0];
-                        break;
-                }
-                if (StringUtils.isBlank(classname)) {
-                    continue;
-                }
+                    }
+                    classname = "com.weibo.motan.benchmark.temp.impl.TestStringRunnable";
+                    String size = category.split("KString")[0];
+                    int length = 1024 * Integer.parseInt(size);
+                    StringBuilder builder = new StringBuilder(length);
+                    for (int i = 0; i < length; i++) {
+                        builder.append((char) (ThreadLocalRandom.current().nextInt(33, 128)));
+                    }
+                    str = builder.toString();
+                    break;
+            }
+            if (StringUtils.isBlank(classname)) {
+                continue;
+            }
 
-                ClientStat stat = new MotanBenchmarkClient(benchmarkService).start(num, warmupTime, benchmarkTime, classname, size);
+            for (int num : concurrentList) {
+                ClientStat stat = new MotanBenchmarkClient(benchmarkService).start(num, warmupTime, benchmarkTime, classname, str);
                 String name = num + "-并发";
 
                 long avgTPS = stat.getAvgTPS();
@@ -87,6 +91,9 @@ public class WebController {
                 }
                 rtItem.put(category, avgRT);
                 rtData.put(name, rtItem);
+
+                System.gc();
+                Thread.sleep(5000);
             }
         }
 

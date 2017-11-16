@@ -67,7 +67,6 @@ public abstract class AbstractClientRunnable implements ClientRunnable {
             try {
                 Object result = call(benchmarkService);
             } catch (Exception e) {
-                e.printStackTrace();
             }
         }
         while (beginTime <= endTime) {
@@ -76,7 +75,6 @@ public abstract class AbstractClientRunnable implements ClientRunnable {
             try {
                 result = call(benchmarkService);
             } catch (Exception e) {
-                e.printStackTrace();
             }
             long responseTime = System.nanoTime() / 1000L - beginTime;
             collectResponseTimeDistribution(responseTime);

@@ -21,19 +21,13 @@ import com.weibo.motan.benchmark.temp.AbstractClientRunnable;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class TestStringRunnable extends AbstractClientRunnable {
     private String str;
 
-    public TestStringRunnable(BenchmarkService service, String size, CyclicBarrier barrier, CountDownLatch latch, long startTime, long endTime) {
+    public TestStringRunnable(BenchmarkService service, String str, CyclicBarrier barrier, CountDownLatch latch, long startTime, long endTime) {
         super(service, barrier, latch, startTime, endTime);
-        int length = 1024 * Integer.parseInt(size);
-        StringBuilder builder = new StringBuilder(length);
-        for (int i = 0; i < length; i++) {
-            builder.append((char) (ThreadLocalRandom.current().nextInt(33, 128)));
-        }
-        str = builder.toString();
+        this.str = str;
     }
 
     @Override

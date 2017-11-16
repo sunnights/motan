@@ -30,7 +30,7 @@ public abstract class AbstractBenchmarkClient {
     private int concurrent;
     private int benchmarkTime;
     private String classname;
-    private String size;
+    private String str;
     private ClientStat statistics;
 
     /**
@@ -38,13 +38,13 @@ public abstract class AbstractBenchmarkClient {
      * @param warmupTime    预热时间
      * @param benchmarkTime 性能测试时间
      * @param classname     测试的类名
-     * @param size          测试String时，指String的size，单位为k
+     * @param str           测试字符串
      */
-    public ClientStat start(int concurrent, int warmupTime, int benchmarkTime, String classname, String size) {
+    public ClientStat start(int concurrent, int warmupTime, int benchmarkTime, String classname, String str) {
         this.concurrent = concurrent;
         this.benchmarkTime = benchmarkTime;
         this.classname = classname;
-        this.size = size;
+        this.str = str;
 
         printStartInfo();
 
@@ -57,7 +57,7 @@ public abstract class AbstractBenchmarkClient {
         CyclicBarrier cyclicBarrier = new CyclicBarrier(this.concurrent);
         CountDownLatch countDownLatch = new CountDownLatch(this.concurrent);
         for (int i = 0; i < this.concurrent; i++) {
-            ClientRunnable runnable = getClientRunnable(classname, size, cyclicBarrier, countDownLatch, startTime, endTime);
+            ClientRunnable runnable = getClientRunnable(classname, str, cyclicBarrier, countDownLatch, startTime, endTime);
             runnables.add(runnable);
             Thread thread = new Thread(runnable, "benchmark-client-" + i);
             thread.start();
@@ -99,7 +99,7 @@ public abstract class AbstractBenchmarkClient {
         System.out.println("Concurrent: " + concurrent);
         System.out.println("Runtime: " + benchmarkTime + " seconds");
         System.out.println("ClassName: " + classname);
-        System.out.println("Size: " + size);
+        System.out.println("Size: " + str.length() / 1024);
         statistics.printStatistics();
     }
 
