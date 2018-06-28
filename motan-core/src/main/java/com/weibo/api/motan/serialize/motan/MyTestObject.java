@@ -27,10 +27,10 @@ import java.util.Map;
 public class MyTestObject {
     public String f3;
     int f1;
-    float f2;
     Map<String, String> f4;
     MyTestSubObject f5;
     List<Object> f6;
+    private float f2;
 
     public int getF1() {
         return f1;
@@ -81,7 +81,7 @@ public class MyTestObject {
     }
 
     public static class MyTestSubObject {
-        String f1;
+        private String f1;
         List<String> f2;
 
         public String getF1() {

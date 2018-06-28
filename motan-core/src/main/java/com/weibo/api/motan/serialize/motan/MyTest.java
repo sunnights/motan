@@ -34,6 +34,7 @@ public class MyTest {
     public static void main(String[] args) {
         register(MyTestObject.class);
         register(MyTestObject.MyTestSubObject.class);
+//        register(SinaUser.class);
 
         Map<String, String> tmap = new HashMap<>(2);
         tmap.put("xxx", "YYY");
@@ -60,6 +61,11 @@ public class MyTest {
 
         MyTestObject newObject = (MyTestObject) MotanSerialization.get(MyTestObject.class.getName()).fromMessage(message);
         System.out.println(JSON.toJSONString(newObject));
+        if (JSON.toJSONString(testObject).equals(JSON.toJSONString(newObject))) {
+            System.out.println(true);
+        } else {
+            System.out.println(false);
+        }
     }
 
     public static boolean isJavaClass(Class<?> clz) {
@@ -73,12 +79,14 @@ public class MyTest {
         sb.append(clazz.getName() + " object = (" + clazz.getName() + ") o;\n");
         int index = 0;
         for (Field field : clazz.getDeclaredFields()) {
+            sb.append("java.lang.reflect.Field f = object.getClass().getDeclaredField(\"" + field.getName() + "\");\n");
+            sb.append("f.setAccessible(true);\n");
             sb.append("message.putField(" + (++index) + ", ");
             if (isJavaClass(field.getType())) {
-                sb.append("($w)object." + field.getName() + ");\n");
+                sb.append("f.get(object));\n");
             } else {
                 Class<?> fieldClass = field.getType();
-                sb.append("MotanSerialization.get(" + fieldClass.getName() + ".class.getName())" + ".toMessage(($w)object." + field.getName() + "));\n");
+                sb.append("MotanSerialization.get(" + fieldClass.getName() + ".class.getName())" + ".toMessage(f.get(object)));\n");
             }
         }
         sb.append("return message;\n");
@@ -99,29 +107,14 @@ public class MyTest {
         sb.append(clazz.getName() + " object = (" + clazz.getName() + ") o;\n");
         int index = 0;
         for (Field field : clazz.getDeclaredFields()) {
-            String prefix = "object." + field.getName() + " = ";
+            sb.append("java.lang.reflect.Field f = object.getClass().getDeclaredField(\"" + field.getName() + "\");\n");
+            sb.append("f.setAccessible(true);\n");
             String value = "message.getField(" + (++index) + ")";
-            if (field.getType() == byte.class) {
-                sb.append(prefix + "((Byte) " + value + ").byteValue();\n");
-            } else if (field.getType() == short.class) {
-                sb.append(prefix + "((Short) " + value + ").shortValue();\n");
-            } else if (field.getType() == int.class) {
-                sb.append(prefix + "((Integer) " + value + ").intValue();\n");
-            } else if (field.getType() == long.class) {
-                sb.append(prefix + "((Long) " + value + ").longValue();\n");
-            } else if (field.getType() == float.class) {
-                sb.append(prefix + "((Float) " + value + ").floatValue();\n");
-            } else if (field.getType() == double.class) {
-                sb.append(prefix + "((Double) " + value + ").doubleValue();\n");
-            } else if (field.getType() == char.class) {
-                sb.append(prefix + "((Char) " + value + ").charValue();\n");
-            } else if (field.getType() == boolean.class) {
-                sb.append(prefix + "((Boolean) " + value + ").booleanValue();\n");
-            } else if (isJavaClass(field.getType())) {
-                sb.append(prefix + "(" + field.getType().getName() + ") " + value + ";\n");
+            if (isJavaClass(field.getType())) {
+                sb.append("f.set(object, " + value + ");");
             } else {
                 Class<?> fieldClass = field.getType();
-                sb.append(prefix + "(" + fieldClass.getName() + ")MotanSerialization.get(" + fieldClass.getName() + ".class.getName())" + ".fromMessage((Message) " + value + ");\n");
+                sb.append("f.set(object, MotanSerialization.get(" + fieldClass.getName() + ".class.getName())" + ".fromMessage((Message) " + value + "));\n");
             }
         }
         sb.append("return object;\n");
