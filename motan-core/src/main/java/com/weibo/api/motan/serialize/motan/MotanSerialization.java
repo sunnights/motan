@@ -65,6 +65,14 @@ public class MotanSerialization implements Serialization {
     }
 
     public static MessageTemplate<?> get(String className){
-        return templates.get(className);
+        MessageTemplate template = templates.get(className);
+        if (template == null) {
+            try {
+                template = MyTest.register(Class.forName(className));
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return template;
     }
 }

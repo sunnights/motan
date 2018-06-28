@@ -32,8 +32,8 @@ import java.util.Map;
  */
 public class MyTest {
     public static void main(String[] args) {
-        register(MyTestObject.class);
-        register(MyTestObject.MyTestSubObject.class);
+//        register(MyTestObject.class);
+//        register(MyTestObject.MyTestSubObject.class);
 //        register(SinaUser.class);
 
         Map<String, String> tmap = new HashMap<>(2);
@@ -81,12 +81,12 @@ public class MyTest {
         for (Field field : clazz.getDeclaredFields()) {
             sb.append("java.lang.reflect.Field f = object.getClass().getDeclaredField(\"" + field.getName() + "\");\n");
             sb.append("f.setAccessible(true);\n");
-            sb.append("message.putField(" + (++index) + ", ");
+            String prefix = "message.putField(" + (++index) + ", ";
             if (isJavaClass(field.getType())) {
-                sb.append("f.get(object));\n");
+                sb.append(prefix + "f.get(object));\n");
             } else {
                 Class<?> fieldClass = field.getType();
-                sb.append("MotanSerialization.get(" + fieldClass.getName() + ".class.getName())" + ".toMessage(f.get(object)));\n");
+                sb.append(prefix + "MotanSerialization.get(" + fieldClass.getName() + ".class.getName())" + ".toMessage(f.get(object)));\n");
             }
         }
         sb.append("return message;\n");
@@ -128,7 +128,7 @@ public class MyTest {
         return ctMethod;
     }
 
-    public static void register(Class clazz) {
+    public static MessageTemplate register(Class clazz) {
         try {
             ClassPool classPool = ClassPool.getDefault();
             classPool.importPackage("com.weibo.api.motan.serialize.motan");
@@ -140,9 +140,11 @@ public class MyTest {
             ctClass.addMethod(fromMessage(ctClass, clazz));
             MessageTemplate messageTemplate = (MessageTemplate) ctClass.toClass().newInstance();
             MotanSerialization.register(clazz.getName(), messageTemplate);
+            return messageTemplate;
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return null;
     }
 
 }

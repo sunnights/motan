@@ -62,6 +62,12 @@
             <groupId>com.weibo.api</groupId>
             <artifactId>api-data</artifactId>
             <version>4.564</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.javassist</groupId>
