@@ -98,7 +98,7 @@ public class MotanV2Codec extends AbstractCodec {
                 putMap(buf, request.getAttachments());
 
                 header.setRequestId(request.getRequestId());
-                if(request.getArguments() != null){
+                if (request.getArguments() != null) {
                     body = serialization.serializeMulti(request.getArguments());
                 }
 
@@ -219,7 +219,7 @@ public class MotanV2Codec extends AbstractCodec {
             byte[] meta = new byte[metaSize];
             buf.position(index);
             buf.get(meta);
-            metaMap = deocdeMeta(meta);
+            metaMap = decodeMeta(meta);
             index += metaSize;
         }
         int bodySize = buf.getInt(index);
@@ -246,7 +246,9 @@ public class MotanV2Codec extends AbstractCodec {
                 request.setMethodName(metaMap.remove(M2_METHOD));
                 request.setParamtersDesc(metaMap.remove(M2_METHOD_DESC));
                 request.setAttachments(metaMap);
-                request.setArguments(new Object[]{obj});
+                if (obj != null) {
+                    request.setArguments(new Object[]{obj});
+                }
                 if (metaMap.get(M2_GROUP) != null) {
                     request.setAttachment(URLParamType.group.getName(), metaMap.get(M2_GROUP));
                 }
@@ -281,7 +283,7 @@ public class MotanV2Codec extends AbstractCodec {
 
     }
 
-    private Map<String, String> deocdeMeta(byte[] meta) {
+    private Map<String, String> decodeMeta(byte[] meta) {
         Map<String, String> map = new HashMap<String, String>();
         if (meta != null && meta.length > 0) {
             String[] s = new String(meta).split("\n");
