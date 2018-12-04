@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:motan="http://api.weibo.com/schema/motan" xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://api.weibo.com/schema/motan http://api.weibo.com/schema/motan.xsd">
+
+    <motan:registry name="myLocal" regProtocol="local" default="true"/>
+
+    <motan:registry name="vintage_reg" regProtocol="vintage" address="config.api.weibo.com"
+                    port="80"
+                    requestTimeout="1000" registrySessionTimeout="10000"
+                    registryRetryPeriod="30000"/>
+
+
+    <motan:protocol name="motan" default="true" loadbalance="roundrobin" haStrategy="failover"/>
+    <motan:protocol name="injvm"/>
+
+    <motan:basicReferer id="clientBasicConfig"
+                        registry="vintage_reg" protocol="motan"
+                        application="friendship"
+                        module="test-rpc"
+                        group="tc-rpc"
+                        requestTimeout="1000"
+                        retries="0"
+                        accessLog="true"
+                        throwException="true"/>
+
+    <motan:referer id="userMappingService" interface="cn.sina.api.user.service.UserMappingService" basicReferer="clientBasicConfig" directUrl="10.73.88.181:8881"/>
+
+</beans>

@@ -36,7 +36,7 @@ import com.weibo.api.motan.util.StringTools;
  * 此filter会对性能产生一定影响，请求量较大时建议关闭。
  *
  * </pre>
- * 
+ *
  * @author fishermen
  * @version V1.0 created at: 2013-5-22
  */
@@ -81,7 +81,7 @@ public class AccessLogFilter implements Filter {
         append(builder, request.getParamtersDesc());
         // 对于client，url中的remote ip, application, module,referer 和 service获取的地方不同
         if (MotanConstants.NODE_TYPE_REFERER.equals(side)) {
-            append(builder, caller.getUrl().getHost());
+            append(builder, caller.getUrl().getServerPortStr());
             append(builder, caller.getUrl().getParameter(URLParamType.application.getName()));
             append(builder, caller.getUrl().getParameter(URLParamType.module.getName()));
         } else {
@@ -90,8 +90,9 @@ public class AccessLogFilter implements Filter {
             append(builder, request.getAttachments().get(URLParamType.module.getName()));
         }
 
-        append(builder, success);
+        append(builder, consumeTime < 100);
         append(builder, request.getAttachments().get(URLParamType.requestIdFromClient.getName()));
+        append(builder, request.getRequestId());
         append(builder, consumeTime);
 
         LoggerUtil.accessLog(builder.substring(0, builder.length() - 1));

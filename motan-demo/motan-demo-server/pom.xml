@@ -37,6 +37,7 @@
         </dependency>
     </dependencies>
     <build>
+        <finalName>motan-demo-server</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -46,6 +47,7 @@
                 <executions>
                     <execution>
                         <id>make-assembly</id>
+                        <phase>package</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>

@@ -4,7 +4,7 @@ cd `dirname $0`
 cd ../lib
 LIB_DIR=`pwd`
 
-SERVER_NAME='com.weibo.motan.demo.client.DemoRpcClient'
+SERVER_NAME='com.weibo.Test'
 PIDS=`ps -ef | grep java | grep "$LIB_DIR" |grep $SERVER_NAME|awk '{print $2}'`
 if [ -z "$PIDS" ]; then
     echo "stop fail! The $SERVER_NAME not start!"
