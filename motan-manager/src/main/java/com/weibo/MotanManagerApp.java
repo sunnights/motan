@@ -18,16 +18,24 @@ package com.weibo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ImportResource;
 
 /**
  * @author wangjunwei
  * @since 2017-06-29
  */
-@SpringBootApplication
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 //@ImportResource(locations = {"classpath:spring-mybatis.xml", "classpath:spring-security.xml"})
 @ImportResource(locations = {"classpath:spring-security.xml"})
-public class MotanManagerApp {
+public class MotanManagerApp extends SpringBootServletInitializer {
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+        return builder.sources(MotanManagerApp.class);
+    }
+
     public static void main(String[] args) {
         SpringApplication.run(MotanManagerApp.class, args);
     }
