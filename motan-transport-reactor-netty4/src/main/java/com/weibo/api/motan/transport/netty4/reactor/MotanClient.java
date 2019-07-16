@@ -31,28 +31,10 @@ public abstract class MotanClient {
         return new MotanClientTcpConfig(this, tcpMapper);
     }
 
-    public final MotanClient port(int port) {
-        return tcpConfiguration(tcpClient -> tcpClient.port(port));
-    }
-
-    public final MotanClient codec(String codec) {
-        return tcpConfiguration(tcpClient -> tcpClient.bootstrap(bootstrap -> MotanClientConfiguration.codec(bootstrap, codec)));
-    }
-
-    public final MotanClient minClientConnection(Integer minClientConnection) {
-        return tcpConfiguration(tcpClient -> tcpClient.bootstrap(bootstrap -> MotanClientConfiguration.minClientConnection(bootstrap, minClientConnection)));
-    }
-
-    public final MotanClient maxClientConnection(Integer maxClientConnection) {
-        return tcpConfiguration(tcpClient -> tcpClient.bootstrap(bootstrap -> MotanClientConfiguration.maxClientConnection(bootstrap, maxClientConnection)));
-    }
-
-    public final MotanClient maxContentLength(Integer maxContentLength) {
-        return tcpConfiguration(tcpClient -> tcpClient.bootstrap(bootstrap -> MotanClientConfiguration.maxContentLength(bootstrap, maxContentLength)));
-    }
-
     public final MotanClient url(URL url) {
-        return tcpConfiguration(tcpClient -> tcpClient.bootstrap(bootstrap -> MotanClientConfiguration.url(bootstrap, url)));
+        tcpConfiguration(tcpClient -> tcpClient.port(url.getPort()));
+        return tcpConfiguration(tcpClient -> tcpClient.bootstrap(bootstrap -> MotanClientConfiguration.url(bootstrap, url))
+                .port(url.getPort()));
     }
 
     public RequestSender build() {
@@ -66,5 +48,4 @@ public abstract class MotanClient {
     public interface ResponseReceiver<S extends ResponseReceiver<?>> {
         Mono<Response> response();
     }
-
 }

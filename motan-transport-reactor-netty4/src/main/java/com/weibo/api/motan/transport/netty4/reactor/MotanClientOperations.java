@@ -5,6 +5,7 @@ import com.weibo.api.motan.rpc.DefaultRequest;
 import com.weibo.api.motan.rpc.Request;
 import com.weibo.api.motan.rpc.Response;
 import com.weibo.api.motan.rpc.URL;
+import com.weibo.api.motan.transport.netty4.CodecUtil;
 import com.weibo.api.motan.transport.netty4.NettyMessage;
 import com.weibo.api.motan.util.LoggerUtil;
 import io.netty.channel.ChannelHandlerContext;
@@ -31,7 +32,8 @@ public class MotanClientOperations extends MotanOperations<NettyInbound, NettyOu
     }
 
     final Mono<Void> send() {
-        return FutureMono.deferFuture(() -> channel().writeAndFlush(request));
+        byte[] bytes = CodecUtil.encodeObjectToBytes(new SimpleChannel(url), codec, request);
+        return FutureMono.deferFuture(() -> channel().writeAndFlush(bytes));
     }
 
     @Override

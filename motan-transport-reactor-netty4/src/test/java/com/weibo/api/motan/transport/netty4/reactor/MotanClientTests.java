@@ -66,11 +66,6 @@ public class MotanClientTests {
     @Test
     public void testClient() {
         MotanClient.RequestSender client = MotanClient.create()
-                .port(url.getPort())
-                .minClientConnection(url.getIntParameter(URLParamType.minClientConnection.getName(), URLParamType.minClientConnection.getIntValue()))
-                .maxClientConnection(url.getIntParameter(URLParamType.maxClientConnection.getName(), URLParamType.maxClientConnection.getIntValue()))
-                .maxContentLength(url.getIntParameter(URLParamType.maxContentLength.getName(), URLParamType.maxContentLength.getIntValue()))
-                .codec(url.getParameter(URLParamType.codec.getName(), URLParamType.codec.getValue()))
                 .url(url)
                 .build();
         callRequest(client, request);

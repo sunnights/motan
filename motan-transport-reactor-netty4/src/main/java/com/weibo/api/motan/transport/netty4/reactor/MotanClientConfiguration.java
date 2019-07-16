@@ -44,28 +44,13 @@ final class MotanClientConfiguration {
         return mcc;
     }
 
-    static Bootstrap codec(Bootstrap b, String codec) {
-        getOrCreate(b).codec = ExtensionLoader.getExtensionLoader(Codec.class).getExtension(codec);
-        return b;
-    }
-
-    static Bootstrap minClientConnection(Bootstrap bootstrap, Integer minClientConnection) {
-        getOrCreate(bootstrap).minClientConnection = minClientConnection;
-        return bootstrap;
-    }
-
-    static Bootstrap maxClientConnection(Bootstrap bootstrap, Integer maxClientConnection) {
-        getOrCreate(bootstrap).maxClientConnection = maxClientConnection;
-        return bootstrap;
-    }
-
-    static Bootstrap maxContentLength(Bootstrap bootstrap, Integer maxContentLength) {
-        getOrCreate(bootstrap).maxContentLength = maxContentLength;
-        return bootstrap;
-    }
-
     static Bootstrap url(Bootstrap bootstrap, URL url) {
-        getOrCreate(bootstrap).url = url;
+        MotanClientConfiguration configuration = getOrCreate(bootstrap);
+        configuration.url = url;
+        configuration.codec = ExtensionLoader.getExtensionLoader(Codec.class).getExtension(url.getParameter(URLParamType.codec.getName(), URLParamType.codec.getValue()));
+        configuration.minClientConnection = url.getIntParameter(URLParamType.minClientConnection.getName(), URLParamType.minClientConnection.getIntValue());
+        configuration.maxClientConnection = url.getIntParameter(URLParamType.maxClientConnection.getName(), URLParamType.maxClientConnection.getIntValue());
+        configuration.maxContentLength = url.getIntParameter(URLParamType.maxContentLength.getName(), URLParamType.maxContentLength.getIntValue());
         return bootstrap;
     }
 
