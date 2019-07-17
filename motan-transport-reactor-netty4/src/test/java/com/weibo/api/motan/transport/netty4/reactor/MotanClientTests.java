@@ -64,16 +64,18 @@ public class MotanClientTests {
     }
 
     @Test
-    public void testClient() {
+    public void testClient() throws InterruptedException {
         MotanClient.RequestSender client = MotanClient.create()
                 .url(url)
                 .build();
         callRequest(client, request);
-        request.setRequestId(RequestIdGenerator.getRequestId());
+        Thread.sleep(3000);
         callRequest(client, request);
+        Thread.sleep(10000);
     }
 
-    private void callRequest(MotanClient.RequestSender client, Request request) {
+    private void callRequest(MotanClient.RequestSender client, DefaultRequest request) {
+        request.setRequestId(RequestIdGenerator.getRequestId());
         Mono<Response> content = client.send(Mono.just(request))
                 .response();
         Response response = content.block();

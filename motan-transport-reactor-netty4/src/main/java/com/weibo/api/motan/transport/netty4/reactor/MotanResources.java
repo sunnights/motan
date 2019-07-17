@@ -24,6 +24,7 @@ public class MotanResources extends TcpResources {
     }
 
     public static MotanResources get() {
-        return getOrCreate(MOTAN_RESOURCES, null, null, ON_MOTAN_NEW, "motan-tcp");
+        ConnectionProvider provider = ConnectionProvider.fixed("motan-conn", DEFAULT_POOL_MAX_CONNECTIONS, 1000);
+        return getOrCreate(MOTAN_RESOURCES, null, provider, ON_MOTAN_NEW, "motan-tcp");
     }
 }

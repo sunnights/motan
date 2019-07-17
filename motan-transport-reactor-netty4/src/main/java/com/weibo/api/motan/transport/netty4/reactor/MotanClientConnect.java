@@ -4,6 +4,8 @@ import com.weibo.api.motan.codec.Codec;
 import com.weibo.api.motan.rpc.URL;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.EventLoopGroup;
 import io.netty.util.AttributeKey;
 import org.reactivestreams.Publisher;
@@ -241,7 +243,7 @@ public class MotanClientConnect extends MotanClient {
         }
     }
 
-    static final class MotanInitializer implements BiConsumer<ConnectionObserver, Channel>, ChannelOperations.OnSetup {
+    static final class MotanInitializer extends ChannelInboundHandlerAdapter implements BiConsumer<ConnectionObserver, Channel>, ChannelOperations.OnSetup {
         final MotanClientHandler handler;
 
         public MotanInitializer(MotanClientHandler handler) {
@@ -258,6 +260,33 @@ public class MotanClientConnect extends MotanClient {
         @Override
         public ChannelOperations<?, ?> create(Connection c, ConnectionObserver listener, Object msg) {
             return new MotanClientOperations(c, listener, handler.codec, handler.url);
+        }
+
+        @Override
+        public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+            System.out.println("--- channelRegistered");
+            super.channelRegistered(ctx);
+        }
+
+        @Override
+        public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
+            System.out.println("--- channelUnregistered");
+            super.channelUnregistered(ctx);
+        }
+
+        @Override
+        public void channelActive(ChannelHandlerContext ctx) throws Exception {
+            ChannelOperations<?, ?> ops = ChannelOperations.get(ctx.channel());
+            if (ops != null) {
+                ops.listener().onStateChange(ops, ConnectionObserver.State.CONFIGURED);
+            }
+            ctx.fireChannelActive();
+        }
+
+        @Override
+        public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+            System.out.println("--- channelInactive");
+            super.channelInactive(ctx);
         }
     }
 }

@@ -3,6 +3,7 @@ package com.weibo.api.motan.transport.netty4.reactor;
 import com.weibo.api.motan.rpc.Request;
 import com.weibo.api.motan.rpc.Response;
 import com.weibo.api.motan.rpc.URL;
+import com.weibo.api.motan.transport.Client;
 import reactor.core.publisher.Mono;
 import reactor.netty.resources.ConnectionProvider;
 import reactor.netty.tcp.TcpClient;
@@ -41,7 +42,7 @@ public abstract class MotanClient {
         return new MotanClientFinalizer(tcpConfiguration());
     }
 
-    public interface RequestSender extends ResponseReceiver<RequestSender> {
+    public interface RequestSender extends ResponseReceiver<RequestSender>, Client {
         ResponseReceiver<?> send(Mono<? extends Request> request);
     }
 

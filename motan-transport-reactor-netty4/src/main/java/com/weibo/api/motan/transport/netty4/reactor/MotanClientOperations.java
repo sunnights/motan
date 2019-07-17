@@ -11,6 +11,7 @@ import com.weibo.api.motan.util.LoggerUtil;
 import io.netty.channel.ChannelHandlerContext;
 import reactor.core.publisher.Mono;
 import reactor.netty.*;
+import reactor.netty.http.client.PrematureCloseException;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -62,12 +63,45 @@ public class MotanClientOperations extends MotanOperations<NettyInbound, NettyOu
     }
 
     @Override
+    protected void onInboundCancel() {
+        if (isInboundDisposed()) {
+            return;
+        }
+        channel().close();
+    }
+
+    @Override
+    protected void onInboundComplete() {
+        super.onInboundComplete();
+    }
+
+    @Override
+    protected void onInboundClose() {
+        if (isInboundCancelled() || isInboundDisposed()) {
+            return;
+        }
+        listener().onStateChange(this, MotanClientState.RESPONSE_INCOMPLETE);
+        // todo
+        super.onInboundError(PrematureCloseException.DURING_RESPONSE);
+    }
+
+    @Override
     protected void onOutboundComplete() {
         if (isInboundCancelled()) {
             return;
         }
         listener().onStateChange(this, MotanClientState.REQUEST_SENT);
         channel().read();
+    }
+
+    @Override
+    protected void onOutboundError(Throwable err) {
+        if (isPersistent()) {
+            listener().onUncaughtException(this, err);
+            terminate();
+            return;
+        }
+        super.onOutboundError(err);
     }
 
     private String getRemoteIp(ChannelHandlerContext ctx) {

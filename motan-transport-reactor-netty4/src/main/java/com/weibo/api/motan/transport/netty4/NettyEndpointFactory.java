@@ -5,6 +5,7 @@ import com.weibo.api.motan.rpc.URL;
 import com.weibo.api.motan.transport.Client;
 import com.weibo.api.motan.transport.MessageHandler;
 import com.weibo.api.motan.transport.Server;
+import com.weibo.api.motan.transport.netty4.reactor.MotanClient;
 import com.weibo.api.motan.transport.support.AbstractEndpointFactory;
 
 /**
@@ -20,6 +21,8 @@ public class NettyEndpointFactory extends AbstractEndpointFactory {
     @Override
     protected Client innerCreateClient(URL url) {
 //        return new NettyClient(url);
-        return null;
+        return MotanClient.create()
+                .url(url)
+                .build();
     }
 }
