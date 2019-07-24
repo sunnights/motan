@@ -262,6 +262,13 @@ public class MotanFrameworkUtil {
         return path;
     }
 
+    public static String removeReactorSuffix(String path) {
+        if (path != null && path.endsWith(MotanConstants.REACTOR_SUFFIX)) {
+            return path.substring(0, path.length() - MotanConstants.REACTOR_SUFFIX.length());
+        }
+        return path;
+    }
+
     public static Response buildErrorResponse(long requestId, Exception e) {
         DefaultResponse response = new DefaultResponse(requestId);
         response.setException(e);

@@ -20,6 +20,7 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import reactor.core.publisher.Mono;
 
 import java.util.Map;
 import java.util.concurrent.*;
@@ -34,6 +35,7 @@ public class NettyClient extends AbstractSharedPoolClient implements StatisticCa
      * 回收过期任务
      */
     private static ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(1);
+    public ConcurrentMap<Long, ChannelListener> listenerMap = new ConcurrentHashMap<>();
     /**
      * 异步的request，需要注册callback future
      * 触发remove的操作有： 1) service的返回结果处理。 2) timeout thread cancel
@@ -101,6 +103,18 @@ public class NettyClient extends AbstractSharedPoolClient implements StatisticCa
         Channel channel;
         Response response;
         try {
+            Mono.using(() -> getChannel(),
+                    ch -> {
+                        try {
+                            Response response1 = ch.request(request);
+                            return (MonoResponse) response1;
+                        } catch (TransportException e) {
+                            e.printStackTrace();
+                        }
+                        return Mono.empty();
+                    },
+                    ch -> {
+                    });
             // return channel or throw exception(timeout or connection_fail)
             channel = getChannel();
             MotanFrameworkUtil.logEvent(request, MotanConstants.TRACE_CONNECTION);
@@ -173,6 +187,11 @@ public class NettyClient extends AbstractSharedPoolClient implements StatisticCa
                                 Response response = (Response) message;
                                 ResponseFuture responseFuture = NettyClient.this.removeCallback(response.getRequestId());
 
+                                // notify listener
+                                ChannelListener listener = listenerMap.get(1L);
+                                if (listener != null) {
+                                    listener.onStateChange(response);
+                                }
                                 if (responseFuture == null) {
                                     LoggerUtil.warn("NettyClient has response from server, but responseFuture not exist, requestId={}", response.getRequestId());
                                     return null;
@@ -182,6 +201,7 @@ public class NettyClient extends AbstractSharedPoolClient implements StatisticCa
                                 } else {
                                     responseFuture.onSuccess(response);
                                 }
+
                                 return null;
                             }
                         }));

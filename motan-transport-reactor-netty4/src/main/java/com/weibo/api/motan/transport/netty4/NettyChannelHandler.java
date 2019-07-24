@@ -34,6 +34,7 @@ public class NettyChannelHandler extends ChannelDuplexHandler {
     private MessageHandler messageHandler;
     private Channel channel;
     private Codec codec;
+    private ChannelListener listener;
 
     public NettyChannelHandler(Channel channel, MessageHandler messageHandler) {
         this.channel = channel;

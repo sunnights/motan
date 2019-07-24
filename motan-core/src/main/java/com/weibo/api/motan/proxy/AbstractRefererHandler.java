@@ -75,20 +75,24 @@ public class AbstractRefererHandler<T> {
             try {
                 MotanFrameworkUtil.logEvent(request, MotanConstants.TRACE_INVOKE);
                 response = cluster.call(request);
+                if (response instanceof AbstractMonoResponse) {
+                    return ((AbstractMonoResponse) response).map(Response::getValue);
+                }
                 if (async) {
+                    ResponseFuture responseFuture;
                     if (response instanceof ResponseFuture) {
-                        ((ResponseFuture) response).setReturnType(returnType);
-                        return response;
+                        responseFuture = (ResponseFuture) response;
+                        responseFuture.setReturnType(returnType);
                     } else {
-                        ResponseFuture responseFuture = new DefaultResponseFuture(request, 0, cluster.getUrl());
+                        responseFuture = new DefaultResponseFuture(request, 0, cluster.getUrl());
                         if (response.getException() != null) {
                             responseFuture.onFailure(response);
                         } else {
                             responseFuture.onSuccess(response);
                         }
                         responseFuture.setReturnType(returnType);
-                        return responseFuture;
                     }
+                    return responseFuture;
                 } else {
                     Object value = response.getValue();
                     if (value != null && value instanceof DeserializableObject) {

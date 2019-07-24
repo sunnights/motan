@@ -19,15 +19,16 @@ package com.weibo.motan.demo.client;
 import com.weibo.api.motan.config.ProtocolConfig;
 import com.weibo.api.motan.config.RefererConfig;
 import com.weibo.api.motan.config.RegistryConfig;
-import com.weibo.motan.demo.service.MotanDemoService;
+import com.weibo.motan.demo.service.MotanDemoServiceReactor;
+import reactor.core.publisher.Mono;
 
 public class MotanApiClientDemo {
 
     public static void main(String[] args) {
-        RefererConfig<MotanDemoService> motanDemoServiceReferer = new RefererConfig<MotanDemoService>();
+        RefererConfig<MotanDemoServiceReactor> motanDemoServiceReferer = new RefererConfig<>();
 
         // 设置接口及实现类
-        motanDemoServiceReferer.setInterface(MotanDemoService.class);
+        motanDemoServiceReferer.setInterface(MotanDemoServiceReactor.class);
 
         // 配置服务的group以及版本号
         motanDemoServiceReferer.setGroup("motan-demo-rpc");
@@ -54,9 +55,17 @@ public class MotanApiClientDemo {
         // motanDemoServiceReferer.setDirectUrl("localhost:8002");  // 注册中心直连调用需添加此配置
 
         // 使用服务
-        MotanDemoService service = motanDemoServiceReferer.getRef();
-        System.out.println(service.hello("motan"));
-
-        System.exit(0);
+//        MotanDemoServiceAsync service = (MotanDemoServiceAsync) motanDemoServiceReferer.getRef();
+//        service.helloAsync("motan");
+//        System.out.println(service.hello("motan"));
+        MotanDemoServiceReactor service = motanDemoServiceReferer.getRef();
+        Mono<String> monoResponse = service.helloReactor("123");
+        String s = monoResponse
+                .block();
+        System.out.println(s);
+//        monoResponse.map(Response::getValue)
+//                .timeout(Duration.ofMillis(100))
+//                .cast(String.class)
+//                .subscribe(System.out::println);
     }
 }
