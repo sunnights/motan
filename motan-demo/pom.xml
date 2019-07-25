@@ -44,7 +44,7 @@
         </dependency>
         <dependency>
             <groupId>com.weibo</groupId>
-            <artifactId>motan-transport-netty4</artifactId>
+            <artifactId>motan-transport-reactor-netty4</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
         <dependency>

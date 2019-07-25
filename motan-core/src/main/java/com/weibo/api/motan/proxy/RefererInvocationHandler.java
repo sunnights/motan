@@ -26,6 +26,7 @@ import com.weibo.api.motan.util.LoggerUtil;
 import com.weibo.api.motan.util.MotanFrameworkUtil;
 import com.weibo.api.motan.util.ReflectUtil;
 import com.weibo.api.motan.util.RequestIdGenerator;
+import reactor.core.publisher.Mono;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -41,7 +42,7 @@ public class RefererInvocationHandler<T> extends AbstractRefererHandler<T> imple
         this.clz = clz;
         this.clusters = clusters;
         init();
-        interfaceName = MotanFrameworkUtil.removeAsyncSuffix(clz.getName());
+        interfaceName = MotanFrameworkUtil.removeExtensionSuffix(clz.getName());
     }
 
     @Override
@@ -64,6 +65,9 @@ public class RefererInvocationHandler<T> extends AbstractRefererHandler<T> imple
         if (methodName.endsWith(MotanConstants.ASYNC_SUFFIX) && method.getReturnType().equals(ResponseFuture.class)) {
             methodName = MotanFrameworkUtil.removeAsyncSuffix(methodName);
             async = true;
+        }
+        if (methodName.endsWith(MotanConstants.REACTOR_SUFFIX) && method.getReturnType().isAssignableFrom(Mono.class)) {
+            methodName = MotanFrameworkUtil.removeReactorSuffix(methodName);
         }
         request.setMethodName(methodName);
         request.setParamtersDesc(ReflectUtil.getMethodParamDesc(method));

@@ -251,6 +251,7 @@ public class NettyClient extends AbstractPoolClient implements StatisticCallback
 
                         ResponseFuture responseFuture = NettyClient.this.removeCallback(response.getRequestId());
 
+
                         if (responseFuture == null) {
                             LoggerUtil.warn(
                                     "NettyClient has response from server, but resonseFuture not exist,  requestId={}",

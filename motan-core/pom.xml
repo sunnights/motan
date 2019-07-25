@@ -28,6 +28,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>io.projectreactor.netty</groupId>
+            <artifactId>reactor-netty</artifactId>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
             <groupId>commons-pool</groupId>
             <artifactId>commons-pool</artifactId>
         </dependency>
@@ -66,8 +71,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
                 <configuration>
-                    <source>${java.source.jdk}</source>
-                    <target>${java.source.jdk}</target>
+                    <source>8</source>
+                    <target>8</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                     <compilerArgument>-proc:none</compilerArgument>
                 </configuration>
