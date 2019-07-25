@@ -19,16 +19,16 @@ package com.weibo.motan.demo.client;
 import com.weibo.api.motan.config.ProtocolConfig;
 import com.weibo.api.motan.config.RefererConfig;
 import com.weibo.api.motan.config.RegistryConfig;
-import com.weibo.motan.demo.service.MotanDemoServiceReactor;
+import com.weibo.motan.demo.service.MotanDemoServiceExtension;
 import reactor.core.publisher.Mono;
 
 public class MotanApiClientDemo {
 
     public static void main(String[] args) {
-        RefererConfig<MotanDemoServiceReactor> motanDemoServiceReferer = new RefererConfig<>();
+        RefererConfig<MotanDemoServiceExtension> motanDemoServiceReferer = new RefererConfig<>();
 
         // 设置接口及实现类
-        motanDemoServiceReferer.setInterface(MotanDemoServiceReactor.class);
+        motanDemoServiceReferer.setInterface(MotanDemoServiceExtension.class);
 
         // 配置服务的group以及版本号
         motanDemoServiceReferer.setGroup("motan-demo-rpc");
@@ -58,7 +58,7 @@ public class MotanApiClientDemo {
 //        MotanDemoServiceAsync service = (MotanDemoServiceAsync) motanDemoServiceReferer.getRef();
 //        service.helloAsync("motan");
 //        System.out.println(service.hello("motan"));
-        MotanDemoServiceReactor service = motanDemoServiceReferer.getRef();
+        MotanDemoServiceExtension service = motanDemoServiceReferer.getRef();
         Mono<String> monoResponse = service.helloReactor("123");
         String s = monoResponse
                 .block();

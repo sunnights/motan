@@ -17,9 +17,11 @@
 package com.weibo.motan.demo.service;
 
 import com.weibo.api.motan.transport.async.MotanAsync;
+import com.weibo.api.motan.transport.extension.MotanExtension;
 import com.weibo.motan.demo.service.model.User;
 
 @MotanAsync
+@MotanExtension
 public interface MotanDemoService {
     String hello(String name);
 

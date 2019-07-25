@@ -70,6 +70,7 @@ public class MotanConstants {
     public static final int STATISTIC_PEROID = 30; // 30 seconds
     public static final String ASYNC_SUFFIX = "Async";// suffix for async call.
     public static final String REACTOR_SUFFIX = "Reactor";// suffix for async call.
+    public static final String EXTENSION_SUFFIX = "Extension";// suffix for async call.
     public static final String APPLICATION_STATISTIC = "statisitic";
     public static final String REQUEST_REMOTE_ADDR = "requestRemoteAddress";
     public static final String CONTENT_LENGTH = "Content-Length";

@@ -42,8 +42,7 @@ public class RefererInvocationHandler<T> extends AbstractRefererHandler<T> imple
         this.clz = clz;
         this.clusters = clusters;
         init();
-        interfaceName = MotanFrameworkUtil.removeAsyncSuffix(clz.getName());
-        interfaceName = MotanFrameworkUtil.removeReactorSuffix(clz.getName());
+        interfaceName = MotanFrameworkUtil.removeExtensionSuffix(clz.getName());
     }
 
     @Override
