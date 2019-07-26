@@ -63,7 +63,7 @@ public class URL {
         this.protocol = protocol;
         this.host = host;
         this.port = port;
-        this.path = removeAsyncPath(path);
+        this.path = removeExtensionPath(path);
         this.parameters = parameters;
     }
 
@@ -177,7 +177,7 @@ public class URL {
     }
 
     public void setPath(String path) {
-        this.path = removeAsyncPath(path);
+        this.path = removeExtensionPath(path);
     }
 
     public String getVersion() {
@@ -498,8 +498,8 @@ public class URL {
      * @param path
      * @return
      */
-    private String removeAsyncPath(String path){
-        return MotanFrameworkUtil.removeAsyncSuffix(path);
+    private String removeExtensionPath(String path) {
+        return MotanFrameworkUtil.removeExtensionSuffix(path);
     }
 
 }

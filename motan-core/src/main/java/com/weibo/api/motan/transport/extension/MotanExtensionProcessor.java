@@ -79,8 +79,7 @@ public class MotanExtensionProcessor extends AbstractProcessor {
             processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "MotanExtensionProcessor will process " + elem.toString() + ", generate class path:" + TARGET_DIR);
             try {
                 if (elem.getKind().isInterface()) {
-                    writeAsyncClass(elem);
-                    writeReactorClass(elem);
+                    writeExtensionClass(elem);
                 } else {
                     processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE,
                             "MotanExtensionProcessor not process, because " + elem.toString() + " not a interface.");
@@ -94,10 +93,7 @@ public class MotanExtensionProcessor extends AbstractProcessor {
         return true;
     }
 
-    private void writeReactorClass(Element elem) {
-    }
-
-    private void writeAsyncClass(Element elem) throws Exception {
+    private void writeExtensionClass(Element elem) throws Exception {
         TypeElement interfaceClazz = (TypeElement) elem;
         String className = interfaceClazz.getSimpleName().toString();
         TypeSpec.Builder classBuilder = TypeSpec.interfaceBuilder(className + EXTENSION)
@@ -125,39 +121,37 @@ public class MotanExtensionProcessor extends AbstractProcessor {
         for (Element e : elements) {
             if (ElementKind.METHOD.equals(e.getKind())) {
                 ExecutableElement method = (ExecutableElement) e;
-                MethodSpec.Builder methodBuilder =
-                        MethodSpec.methodBuilder(method.getSimpleName().toString() + ASYNC)
-                                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).returns(ResponseFuture.class)
-                                .addTypeVariables(getTypeNames(method.getTypeParameters()));
-                // add method params
-                List<? extends VariableElement> vars = method.getParameters();
-                for (VariableElement var : vars) {
-                    methodBuilder.addParameter(ParameterSpec.builder(TypeName.get(var.asType()), var.getSimpleName().toString())
-                            .build());
-                }
-                classBuilder.addMethod(methodBuilder.build());
-
-                try {
-                    MethodSpec.Builder methodBuilder2 = MethodSpec.methodBuilder(method.getSimpleName().toString() + REACTOR)
-                            .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).returns(ParameterizedTypeName.get(Mono.class, Class.forName(method.getReturnType().toString())));
-
-                    // add method params
-                    List<? extends VariableElement> vars2 = method.getParameters();
-                    for (VariableElement var : vars2) {
-                        methodBuilder2.addParameter(ParameterSpec.builder(TypeName.get(var.asType()), var.getSimpleName().toString())
-                                .build());
-                    }
-                    classBuilder.addMethod(methodBuilder2.build());
-                } catch (ClassNotFoundException ex) {
-                    processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING,
-                            "MotanExtensionProcessor process " + e.toString() + " fail. exception:" + ex.getMessage());
-                }
+                classBuilder.addMethod(addAsyncMethod(method));
+                classBuilder.addMethod(addReactorMethod(method));
             }
         }
     }
 
-    private List<TypeVariableName> getTypeNames(TypeMirror returnType) {
-        return null;
+    private MethodSpec addAsyncMethod(ExecutableElement method) {
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(method.getSimpleName().toString() + ASYNC)
+                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT).returns(ResponseFuture.class)
+                .addTypeVariables(getTypeNames(method.getTypeParameters()));
+        // add method params
+        List<? extends VariableElement> vars = method.getParameters();
+        for (VariableElement var : vars) {
+            methodBuilder.addParameter(ParameterSpec.builder(TypeName.get(var.asType()), var.getSimpleName().toString())
+                    .build());
+        }
+        return methodBuilder.build();
+    }
+
+    private MethodSpec addReactorMethod(ExecutableElement method) {
+        MethodSpec.Builder methodBuilder = MethodSpec.methodBuilder(method.getSimpleName().toString() + REACTOR)
+                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                .returns(ParameterizedTypeName.get(ClassName.get(Mono.class), TypeName.get(method.getReturnType()).box()))
+                .addTypeVariables(getTypeNames(method.getTypeParameters()));
+        // add method params
+        List<? extends VariableElement> vars = method.getParameters();
+        for (VariableElement var : vars) {
+            methodBuilder.addParameter(ParameterSpec.builder(TypeName.get(var.asType()), var.getSimpleName().toString())
+                    .build());
+        }
+        return methodBuilder.build();
     }
 
     private List<TypeVariableName> getTypeNames(List<? extends TypeParameterElement> types) {

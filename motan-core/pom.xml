@@ -28,9 +28,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.projectreactor.netty</groupId>
-            <artifactId>reactor-netty</artifactId>
-            <version>RELEASE</version>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core</artifactId>
+            <version>3.2.10.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>commons-pool</groupId>

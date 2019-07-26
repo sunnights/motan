@@ -22,6 +22,7 @@ import com.weibo.api.motan.exception.MotanServiceException;
 import com.weibo.api.motan.rpc.DefaultRequest;
 import com.weibo.api.motan.rpc.Referer;
 import com.weibo.api.motan.rpc.ResponseFuture;
+import com.weibo.api.motan.rpc.RpcContext;
 import com.weibo.api.motan.util.LoggerUtil;
 import com.weibo.api.motan.util.MotanFrameworkUtil;
 import com.weibo.api.motan.util.ReflectUtil;
@@ -68,6 +69,7 @@ public class RefererInvocationHandler<T> extends AbstractRefererHandler<T> imple
         }
         if (methodName.endsWith(MotanConstants.REACTOR_SUFFIX) && method.getReturnType().isAssignableFrom(Mono.class)) {
             methodName = MotanFrameworkUtil.removeReactorSuffix(methodName);
+            RpcContext.getContext().putAttribute(MotanConstants.REACTOR_SUFFIX, true);
         }
         request.setMethodName(methodName);
         request.setParamtersDesc(ReflectUtil.getMethodParamDesc(method));

@@ -23,7 +23,7 @@ public class MonoResponse extends AbstractMonoResponse {
     public void subscribe(CoreSubscriber<? super Response> actual) {
         Mono.<Response>create(sink -> {
             // add listener
-            nettyChannel.getNettyClient().listenerMap.put(1L, new ChannelListener() {
+            nettyChannel.getNettyClient().listenerMap.put(request.getRequestId(), new ChannelListener() {
                 @Override
                 public void onStateChange(Response response) {
                     sink.success(response);

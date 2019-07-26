@@ -13,14 +13,16 @@
  */
 package com.weibo.motan.demo.service;
 
+import com.weibo.api.motan.transport.async.MotanAsync;
+import com.weibo.api.motan.transport.extension.MotanExtension;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.weibo.api.motan.transport.async.MotanAsync;
-
 @MotanAsync
+@MotanExtension
 public interface TestInterface<K, V> extends TestSuperInterface {
     ArrayList<String> xxx(ConcurrentHashMap<String, Boolean> map);
 

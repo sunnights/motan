@@ -19,15 +19,16 @@ package com.weibo.motan.demo.client;
 import com.weibo.api.motan.config.ProtocolConfig;
 import com.weibo.api.motan.config.RefererConfig;
 import com.weibo.api.motan.config.RegistryConfig;
-import com.weibo.motan.demo.service.MotanDemoService;
+import com.weibo.motan.demo.service.MotanDemoServiceExtension;
+import reactor.core.publisher.Mono;
 
-public class MotanApiClientDemo {
+public class MotanReactorClientDemo {
 
-    public static void main(String[] args) {
-        RefererConfig<MotanDemoService> motanDemoServiceReferer = new RefererConfig<MotanDemoService>();
+    public static void main(String[] args) throws InterruptedException {
+        RefererConfig<MotanDemoServiceExtension> motanDemoServiceReferer = new RefererConfig<>();
 
         // 设置接口及实现类
-        motanDemoServiceReferer.setInterface(MotanDemoService.class);
+        motanDemoServiceReferer.setInterface(MotanDemoServiceExtension.class);
 
         // 配置服务的group以及版本号
         motanDemoServiceReferer.setGroup("motan-demo-rpc");
@@ -54,8 +55,12 @@ public class MotanApiClientDemo {
         // motanDemoServiceReferer.setDirectUrl("localhost:8002");  // 注册中心直连调用需添加此配置
 
         // 使用服务
-        MotanDemoService service = motanDemoServiceReferer.getRef();
-        System.out.println(service.hello("motan"));
+        MotanDemoServiceExtension reactorService = motanDemoServiceReferer.getRef();
+        Mono<String> s1 = reactorService.helloReactor("123");
+        Mono<String> s2 = reactorService.helloReactor("456");
+        System.out.println(s1.block());
+        Thread.sleep(1000);
+        System.out.println(s2.block());
 
         System.exit(0);
     }

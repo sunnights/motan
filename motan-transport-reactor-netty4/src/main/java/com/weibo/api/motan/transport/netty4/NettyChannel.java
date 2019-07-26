@@ -2,6 +2,7 @@ package com.weibo.api.motan.transport.netty4;
 
 import com.weibo.api.motan.codec.Codec;
 import com.weibo.api.motan.common.ChannelState;
+import com.weibo.api.motan.common.MotanConstants;
 import com.weibo.api.motan.common.URLParamType;
 import com.weibo.api.motan.core.extension.ExtensionLoader;
 import com.weibo.api.motan.exception.MotanErrorMsgConstant;
@@ -10,7 +11,9 @@ import com.weibo.api.motan.exception.MotanServiceException;
 import com.weibo.api.motan.rpc.*;
 import com.weibo.api.motan.transport.Channel;
 import com.weibo.api.motan.transport.TransportException;
+import com.weibo.api.motan.util.ExceptionUtil;
 import com.weibo.api.motan.util.LoggerUtil;
+import com.weibo.api.motan.util.MotanFrameworkUtil;
 import io.netty.channel.ChannelFuture;
 
 import java.net.InetSocketAddress;
@@ -67,8 +70,12 @@ public class NettyChannel implements Channel {
         ResponseFuture response = new DefaultResponseFuture(request, timeout, this.nettyClient.getUrl());
         this.nettyClient.registerCallback(request.getRequestId(), response);
 
-        return new MonoResponse(this, request);
-        /*
+        Object reactor = RpcContext.getContext().getAttribute(MotanConstants.REACTOR_SUFFIX);
+        if (reactor instanceof Boolean && (Boolean) reactor) {
+            RpcContext.getContext().removeAttribute(MotanConstants.REACTOR_SUFFIX);
+            return new MonoResponse(this, request);
+        }
+
         byte[] msg = CodecUtil.encodeObjectToBytes(this, codec, request);
         ChannelFuture writeFuture = this.channel.writeAndFlush(msg);
         boolean result = writeFuture.awaitUninterruptibly(timeout, TimeUnit.MILLISECONDS);
@@ -106,7 +113,7 @@ public class NettyChannel implements Channel {
             throw new MotanServiceException("NettyChannel send request to server Timeout: url="
                     + nettyClient.getUrl().getUri() + " local=" + localAddress + " "
                     + MotanFrameworkUtil.toString(request));
-        }*/
+        }
     }
 
     @Override

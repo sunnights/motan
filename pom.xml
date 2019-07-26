@@ -72,6 +72,11 @@
                 <artifactId>guava</artifactId>
                 <version>18.0</version>
             </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-all</artifactId>
+                <version>4.1.37.Final</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

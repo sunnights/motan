@@ -20,7 +20,6 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import reactor.core.publisher.Mono;
 
 import java.util.Map;
 import java.util.concurrent.*;
@@ -103,18 +102,6 @@ public class NettyClient extends AbstractSharedPoolClient implements StatisticCa
         Channel channel;
         Response response;
         try {
-            Mono.using(() -> getChannel(),
-                    ch -> {
-                        try {
-                            Response response1 = ch.request(request);
-                            return (MonoResponse) response1;
-                        } catch (TransportException e) {
-                            e.printStackTrace();
-                        }
-                        return Mono.empty();
-                    },
-                    ch -> {
-                    });
             // return channel or throw exception(timeout or connection_fail)
             channel = getChannel();
             MotanFrameworkUtil.logEvent(request, MotanConstants.TRACE_CONNECTION);
@@ -188,7 +175,7 @@ public class NettyClient extends AbstractSharedPoolClient implements StatisticCa
                                 ResponseFuture responseFuture = NettyClient.this.removeCallback(response.getRequestId());
 
                                 // notify listener
-                                ChannelListener listener = listenerMap.get(1L);
+                                ChannelListener listener = listenerMap.remove(response.getRequestId());
                                 if (listener != null) {
                                     listener.onStateChange(response);
                                 }
